@@ -98,17 +98,23 @@ $(document).ready(function () {
     function renderResults(data, query) {
         let html = '';
 
+        // Knowledge graph
         if (data.knowledgeGraph) {
             html += buildKnowledgeGraph(data.knowledgeGraph);
         }
 
-        // You probably also want organic results here, but I’m leaving your structure
-
-        if (!data.knowledgeGraph) {
+        // Organic results
+        if (data.organic && data.organic.length > 0) {
+            html += '<div class="section-label">Results</div>';
+            data.organic.forEach(function (r) {
+                html += buildOrganicResult(r);
+            });
+        } else if (!data.knowledgeGraph) {
             html += '<p style="color:#fff;text-align:center;padding:20px;">No results found for ' +
                 escHtml(query) + '.</p>';
         }
 
+        // People Also Ask
         if (data.peopleAlsoAsk && data.peopleAlsoAsk.length > 0) {
             html += '<div class="section-label">People Also Ask</div>';
             data.peopleAlsoAsk.forEach(function (item) {
@@ -116,6 +122,7 @@ $(document).ready(function () {
             });
         }
 
+        // Related Searches
         if (data.relatedSearches && data.relatedSearches.length > 0) {
             html += '<div class="section-label">Related Searches</div>';
             html += '<div class="related-searches">';
