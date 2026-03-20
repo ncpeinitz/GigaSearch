@@ -44,7 +44,7 @@ body
 {
     background: rgba(0,0,0,0.55);
     backdrop-filter: blur(10px);
-    border-radius: 14px;
+    border-radius: 5px;
     padding: 28px 36px;
     display: inline-block;
     width: 100%;
@@ -55,7 +55,7 @@ body
     background: rgba(255, 255, 255, 0.94);
     font-size: 1.1rem;
     border: none;
-    border-radius: 25px;
+    border-radius: 10px;
     padding: 12px 20px;
     display: inline-block;
     width: 72%;
@@ -73,15 +73,14 @@ body
     gap: 10px;
 }
 
-    #buttonRow button
-    {
+    #buttonRow button {
         padding: 10px 22px;
         font-size: 0.95rem;
         border: none;
-        border-radius: 22px;
+        border-radius: 10px;
         cursor: pointer;
-        background: linear-gradient(135deg, #4a90e2, #1a5db5);
-        color: #fff;
+        background: linear-gradient(135deg, #87ceeb, #4fb8dd);
+        color: #1a2a3a;
         font-weight: 600;
         box-shadow: 0 3px 9px rgba(0,0,0,0.35);
         transition: background 0.2s, transform 0.15s;
@@ -93,10 +92,9 @@ body
         transform: translateY(-2px);
     }
 
-    #luckyButton
-    {
-        background: linear-gradient(135deg, #34a853, #1e7a35) !important;
-    }
+#luckyButton {
+    background: linear-gradient(135deg, #fde68a, #f5c842) !important;
+}
 
     #luckyButton:hover
     {
@@ -318,7 +316,7 @@ body
     background: rgba(255,255,255,0.93);
     color: #1558d6;
     padding: 7px 14px;
-    border-radius: 20px;
+    border-radius: 12px;
     font-size: 0.87rem;
     cursor: pointer;
     box-shadow: 0 1px 5px rgba(0,0,0,0.1);

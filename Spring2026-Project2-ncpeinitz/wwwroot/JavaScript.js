@@ -33,28 +33,28 @@ $(document).ready(function () {
     // Time Button
     $('#timeButton').click(function () {
         const now = new Date();
-        const hr = String(now.getHours()).padStart(2, '0');
-        const mi = String(now.getMinutes()).padStart(2, '0');
-        $('#time').css('visibility', 'visible').html(hr + ':' + mi);
+        const current_hour = String(now.getHours()).padStart(2, '0');
+        const current_minute = String(now.getMinutes()).padStart(2, '0');
+        $('#time').css('visibility', 'visible').html(current_hour + ':' + current_minute);
         $('#time').dialog('open');
     });
 
     // Trigger Search
-    $('#searchButton').click(function () { doSearch(); });
+    $('#searchButton').click(function () { execute_search(); });
 
     // Enter key support
-    $('#query').keyup(function (e) {
+    $('#query').keyup(function (keyboard_event) {
         const Enter = 13;
-        if (e.keyCode === Enter) { doSearch(); }
+        if (keyboard_event.keyCode === Enter) { execute_search(); }
     });
 
     // Bonus Button
     $('#luckyButton').click(function () {
-        const q = $('#query').val().trim();
-        if (!q) { alert('Enter a search term first.'); return; }
+        const search_query_text = $('#query').val().trim();
+        if (!search_query_text) { alert('Enter a search term first.'); return; }
 
         $.ajax({
-            url: buildUrl(q),
+            url: buildUrl(search_query_text),
             method: 'GET',
             dataType: 'json'
         }).done(function (data) {
@@ -64,14 +64,14 @@ $(document).ready(function () {
                 alert('No results found to get lucky with!');
             }
         }).fail(function (jqXHR) {
-            alert('Request failed: ' + getApiError(jqXHR));
+            alert('Request failed: ' + get_API_Error(jqXHR));
         });
     });
 
     // Core search function
-    function doSearch() {
-        const q = $('#query').val().trim();
-        if (!q) { alert('Please enter a search term.'); return; }
+    function execute_search() {
+        const search_query_text = $('#query').val().trim();
+        if (!search_query_text) { alert('Please enter a search term.'); return; }
 
         // Show a loading state immediately
         $('#searchResults')
@@ -79,17 +79,17 @@ $(document).ready(function () {
             .html('<p style="color:#cce0ff;text-align:center;padding:20px;">Searching...</p>');
 
         $.ajax({
-            url: buildUrl(q),
+            url: buildUrl(search_query_text),
             method: 'GET',
             dataType: 'json'
-        }).done(function (data) {
-            renderResults(data, q);
+        }).done(function(data) {
+            renderResults(data, search_query_text);
         }).fail(function (jqXHR) {
-            const msg = getApiError(jqXHR);
+            const msg = get_API_Error(jqXHR);
             $('#searchResults').html(
                 '<p style="color:#ff8080;background:rgba(0,0,0,0.6);' +
                 'padding:16px;border-radius:8px;text-align:center;">' +
-                '&#9888; Search failed: ' + escHtml(msg) + '</p>'
+                '&#9888; Search failed: ' + escape_html(msg) + '</p>'
             );
         });
     }
@@ -100,25 +100,25 @@ $(document).ready(function () {
 
         // Knowledge graph
         if (data.knowledgeGraph) {
-            html += buildKnowledgeGraph(data.knowledgeGraph);
+            html += build_knowledge_graph(data.knowledgeGraph);
         }
 
         // Organic results
         if (data.organic && data.organic.length > 0) {
             html += '<div class="section-label">Results</div>';
-            data.organic.forEach(function (r) {
-                html += buildOrganicResult(r);
+            data.organic.forEach(function (organic_results_list) {
+                html += build_organic_results(organic_results_list);
             });
         } else if (!data.knowledgeGraph) {
             html += '<p style="color:#fff;text-align:center;padding:20px;">No results found for ' +
-                escHtml(query) + '.</p>';
+                escape_html(query) + '.</p>';
         }
 
         // People Also Ask
         if (data.peopleAlsoAsk && data.peopleAlsoAsk.length > 0) {
             html += '<div class="section-label">People Also Ask</div>';
             data.peopleAlsoAsk.forEach(function (item) {
-                html += buildPaaItem(item);
+                html += build_people_also_ask_item(item);
             });
         }
 
@@ -128,7 +128,7 @@ $(document).ready(function () {
             html += '<div class="related-searches">';
             data.relatedSearches.forEach(function (item) {
                 if (item && item.query) {
-                    html += '<a class="related-link">' + escHtml(item.query) + '</a>';
+                    html += '<a class="related-link">' + escape_html(item.query) + '</a>';
                 }
             });
             html += '</div>';
@@ -143,26 +143,26 @@ $(document).ready(function () {
 
         $('.related-link').click(function () {
             $('#query').val($(this).text());
-            doSearch();
+            execute_search();
         });
     }
 
-    function buildKnowledgeGraph(kg) {
+    function build_knowledge_graph(knowledge_graph_data) {
         let h = '<div class="knowledge-graph">';
-        if (kg.imageUrl) {
-            h += '<img src="' + escHtml(kg.imageUrl) + '" alt="' + escHtml(kg.title || '') + '">';
+        if (knowledge_graph_data.imageUrl) {
+            h += '<img src="' + escape_html(knowledge_graph_data.imageUrl) + '" alt="' + escape_html(knowledge_graph_data.title || '') + '">';
         }
         h += '<div class="kg-text">';
-        if (kg.title) h += '<h2>' + escHtml(kg.title) + '</h2>';
-        if (kg.type) h += '<div class="kg-type">' + escHtml(kg.type) + '</div>';
-        if (kg.description) h += '<p>' + escHtml(kg.description) + '</p>';
-        if (kg.attributes && typeof kg.attributes === 'object') {
-            const entries = Object.entries(kg.attributes);
+        if (knowledge_graph_data.title) h += '<h2>' + escape_html(knowledge_graph_data.title) + '</h2>';
+        if (knowledge_graph_data.type) h += '<div class="kg-type">' + escape_html(knowledge_graph_data.type) + '</div>';
+        if (knowledge_graph_data.description) h += '<p>' + escape_html(knowledge_graph_data.description) + '</p>';
+        if (knowledge_graph_data.attributes && typeof knowledge_graph_data.attributes === 'object') {
+            const entries = Object.entries(knowledge_graph_data.attributes);
             if (entries.length > 0) {
                 h += '<div class="kg-attributes">';
                 entries.forEach(function ([key, val]) {
-                    h += '<span><strong>' + escHtml(key) + ':</strong> ' +
-                        escHtml(String(val)) + '</span>';
+                    h += '<span><strong>' + escape_html(key) + ':</strong> ' +
+                        escape_html(String(val)) + '</span>';
                 });
                 h += '</div>';
             }
@@ -171,25 +171,25 @@ $(document).ready(function () {
         return h;
     }
 
-    function buildOrganicResult(r) {
+    function build_organic_results(r) {
         const link = r.link || '#';
         const title = r.title || 'No Title';
         const snippet = r.snippet || '';
 
         let h = '<div class="organic-result">';
-        h += '<div class="result-url">' + escHtml(link) + '</div>';
-        h += '<h3><a href="' + escHtml(link) + '" target="_blank">' +
-            escHtml(title) + '</a></h3>';
+        h += '<div class="result-url">' + escape_html(link) + '</div>';
+        h += '<h3><a href="' + escape_html(link) + '" target="_blank">' +
+            escape_html(title) + '</a></h3>';
         if (snippet) {
-            h += '<p class="snippet">' + escHtml(snippet) + '</p>';
+            h += '<p class="snippet">' + escape_html(snippet) + '</p>';
         }
         if (r.sitelinks && Array.isArray(r.sitelinks) && r.sitelinks.length > 0) {
             h += '<div class="sitelinks">';
             r.sitelinks.forEach(function (sl) {
                 const slLink = sl.link || '#';
                 const slTitle = sl.title || slLink;
-                h += '<a href="' + escHtml(slLink) + '" target="_blank">' +
-                    escHtml(slTitle) + '</a>';
+                h += '<a href="' + escape_html(slLink) + '" target="_blank">' +
+                    escape_html(slTitle) + '</a>';
             });
             h += '</div>';
         }
@@ -197,15 +197,15 @@ $(document).ready(function () {
         return h;
     }
 
-    function buildPaaItem(item) {
+    function build_people_also_ask_item(item) {
         const question = item.question || 'Unknown question';
         let h = '<div class="paa-item">';
-        h += '<div class="paa-question">' + escHtml(question) + '</div>';
+        h += '<div class="paa-question">' + escape_html(question) + '</div>';
         h += '<div class="paa-answer">';
-        if (item.snippet) h += escHtml(item.snippet);
+        if (item.snippet) h += escape_html(item.snippet);
         if (item.link) {
-            h += '<a href="' + escHtml(item.link) + '" target="_blank">' +
-                escHtml(item.title || item.link) + '</a>';
+            h += '<a href="' + escape_html(item.link) + '" target="_blank">' +
+                escape_html(item.title || item.link) + '</a>';
         }
         h += '</div></div>';
         return h;
@@ -218,7 +218,7 @@ $(document).ready(function () {
     }
 
     // Extract a human-readable error from a failed $.ajax call
-    function getApiError(jqXHR) {
+    function get_API_Error(jqXHR) {
         if (jqXHR.responseJSON && jqXHR.responseJSON.message) {
             return jqXHR.responseJSON.message;
         }
@@ -226,13 +226,13 @@ $(document).ready(function () {
         if (jqXHR.status === 400) return 'Bad request (400).';
         if (jqXHR.status === 401) return 'Invalid API key (401).';
         if (jqXHR.status === 403) return 'Forbidden (403).';
-        if (jqXHR.status === 429) return 'Rate limit exceeded — you\'ve used your 2,500 free searches.';
+        if (jqXHR.status === 429) return 'Rate limit exceeded — you used your 2,500 free searches.';
         if (jqXHR.status === 500) return 'Serper server error (500) — try again.';
         return 'Unknown error (' + jqXHR.status + ').';
     }
 
     // XSS protection
-    function escHtml(str) {
+    function escape_html(str) {
         if (typeof str !== 'string') return '';
         return str
             .replace(/&/g, '&amp;')
