@@ -1,5 +1,3 @@
-# Spring2026-Project2-ncpeinitz
-
 # GigaSearch
 
 Aurora Search is a styled search-engine web app built with HTML, CSS, JavaScript, jQuery, and jQuery UI. It performs live searches through a search API and presents results in a familiar search-engine layout with knowledge graph results, organic links, people-also-ask content, and related searches.
