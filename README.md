@@ -50,8 +50,3 @@ Aurora Search is a styled search-engine web app built with HTML, CSS, JavaScript
 ## Deployment
 
 This site was published to Microsoft Azure as part of the project requirements.
-
-## Author
-
-[Your Name]  
-University of Alabama
